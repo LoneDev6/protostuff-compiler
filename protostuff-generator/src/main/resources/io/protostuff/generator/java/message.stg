@@ -154,13 +154,13 @@ field_initializer(field) ::= <<
 if (<field.javaName> == null) {
     <field.javaName> = java.util.Collections.emptyMap();
 } else {
-    <field.javaName> = java.util.Collections.unmodifiableMap(<field.javaName>);
+    <field.javaName> = java.util.Collections.synchronizedMap(<field.javaName>);
 }
 <elseif(field.repeated)>
 if (<field.javaName> == null) {
     <field.javaName> = java.util.Collections.emptyList();
 } else {
-    <field.javaName> = java.util.Collections.unmodifiableList(<field.javaName>);
+    <field.javaName> = java.util.Collections.synchronizedList(<field.javaName>);
 }
 <endif>
 >>

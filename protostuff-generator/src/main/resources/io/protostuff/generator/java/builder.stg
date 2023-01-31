@@ -57,7 +57,7 @@ public <field.javaRepeatedType> <field.javaBuilderRepeatedGetterName>() {
     if (this.<field.javaName> == null) {
         return java.util.Collections.emptyList();
     }
-    return java.util.Collections.unmodifiableList(this.<field.javaName>);    
+    return java.util.Collections.synchronizedList(this.<field.javaName>);    
 }
 
 public Builder <field.javaBuilderRepeatedSetterName>(<field.javaRepeatedType> <field.javaName>) {
