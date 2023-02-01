@@ -39,11 +39,6 @@ public static final class Schema implements io.protostuff.Schema\<<message.javaN
 
     @Override
     public void mergeFrom(io.protostuff.Input input, <message.javaName> instance) throws java.io.IOException {
-    	if (instance.__merge_lock) {
-    		throw new IllegalStateException("Cannot reuse message instance");
-    	} else {
-    		instance.__merge_lock = true;
-    	}
     	while(true) {
     		int number = input.readFieldNumber(this);
             if (number == 0) {
@@ -55,7 +50,7 @@ public static final class Schema implements io.protostuff.Schema\<<message.javaN
                     input.handleUnknownField(number, this);
             }
     	}
-        <message.fields:make_unmodifiable(); separator="\n">
+        instance.initialize();
     }
 
     @Override
@@ -80,28 +75,6 @@ public static final class Schema implements io.protostuff.Schema\<<message.javaN
 }
 >>
 
-make_unmodifiable(field) ::= <<
-<if(field.map)>
-if((instance.<field.javaBitFieldName> & <field.javaBitFieldMask>) == <field.javaBitFieldMask>) {
-    instance.<field.javaName> = java.util.Collections.unmodifiableMap(instance.<field.javaName>);
-}
-<elseif(field.repeated)>
-if((instance.<field.javaBitFieldName> & <field.javaBitFieldMask>) == <field.javaBitFieldMask>) {
-    instance.<field.javaName> = java.util.Collections.unmodifiableList(instance.<field.javaName>);
-}
-<endif>
->>
-
-schema_ensure_mutable(field) ::= <<
-if(!((instance.<field.javaBitFieldName> & <field.javaBitFieldMask>) == <field.javaBitFieldMask>)) {
-<if(field.map)>
-    instance.<field.javaName> = new java.util.HashMap\<>();
-<elseif(field.repeated)>
-    instance.<field.javaName> = new java.util.ArrayList\<>();
-<endif>
-    instance.<field.javaBitFieldName> |= <field.javaBitFieldMask>;
-}
->>
 
 field_merge_switch(field) ::= <<
 case <field.tag>:
@@ -119,9 +92,9 @@ case <field.tag>:
 
 singular_field_merge_switch(field) ::= <<
 <if(field.type.message)>
-instance.<field.javaName> = input.mergeObject(null, <field.javaType>.getSchema());
+instance.<field.javaName> = input.mergeObject(instance.<field.javaName>, <field.javaType>.SCHEMA);
 <elseif(field.type.enum)>
-instance.<field.javaName> = input.readEnum();
+instance.<field.javaName> = <field.javaType>.valueOf(input.readEnum());
 <else>
 instance.<field.javaName> = input.<field.protostuffReadMethod>();
 <endif>
@@ -131,9 +104,9 @@ instance.<field.javaBitFieldName> |= <field.javaBitFieldMask>;
 oneof_field_merge_switch(field) ::= <<
 {
     <if(field.type.message)>
-    instance.<field.oneof.javaFieldName> = input.mergeObject(null, <field.javaType>.getSchema());
+    instance.<field.oneof.javaFieldName> = input.mergeObject(instance.<field.javaName>, <field.javaType>.SCHEMA);
     <elseif(field.type.enum)>
-    instance.<field.oneof.javaFieldName> = input.readEnum();
+    instance.<field.oneof.javaFieldName> = <field.javaType>.valueOf(input.readEnum());
     <else>
     instance.<field.oneof.javaFieldName> = input.<field.protostuffReadMethod>();
     <endif>
@@ -143,21 +116,29 @@ oneof_field_merge_switch(field) ::= <<
 
 map_field_merge_switch(field) ::= <<
 {
-    <field:schema_ensure_mutable()>
-    <field.javaType> entry = input.mergeObject(null, <field.javaType>.getSchema());
+    if(instance.<field.javaName> == null) {
+        instance.<field.javaName> = new java.util.HashMap\<>();
+    }
+    <field.javaType> entry = input.mergeObject(null, <field.javaType>.SCHEMA);
     instance.<field.javaName>.put(entry.getKey(), entry.getValue());
 }
 >>
 
 repeated_field_merge_switch(field) ::= <<
 <if(field.type.message)>
-<field:schema_ensure_mutable()>
-instance.<field.javaName>.add(input.mergeObject(null, <field.javaType>.getSchema()));
+if(instance.<field.javaName> == null) {
+	instance.<field.javaName> = new java.util.ArrayList\<>();
+}
+instance.<field.javaName>.add(input.mergeObject(null, <field.javaType>.SCHEMA));
 <elseif(field.type.enum)>
-<field:schema_ensure_mutable()>
-instance.<field.javaName>.add(input.readEnum());
+if(instance.<field.javaName> == null) {
+	instance.<field.javaName> = new java.util.ArrayList\<>();
+}
+instance.<field.javaName>.add(<field.javaType>.valueOf(input.readEnum()));
 <else>
-<field:schema_ensure_mutable()>
+if(instance.<field.javaName> == null) {
+	instance.<field.javaName> = new java.util.ArrayList\<>();
+}
 instance.<field.javaName>.add(input.<field.protostuffReadMethod>());
 <endif>
 >>
@@ -177,7 +158,7 @@ field_write_switch(field) ::= <%
 singular_field_write_switch(field) ::= <<
 <if(field.type.message)>
 if((instance.<field.javaBitFieldName> & <field.javaBitFieldMask>) == <field.javaBitFieldMask>) {
-	output.writeObject(<field.tag>, instance.<field.javaName>, <field.javaType>.getSchema(), false);
+	output.writeObject(<field.tag>, instance.<field.javaName>, <field.javaType>.SCHEMA, false);
 }
 <elseif(field.type.map)>
 if((instance.<field.javaBitFieldName> & <field.javaBitFieldMask>) == <field.javaBitFieldMask>) {
@@ -186,7 +167,7 @@ if((instance.<field.javaBitFieldName> & <field.javaBitFieldMask>) == <field.java
 }
 <elseif(field.type.enum)>
 if((instance.<field.javaBitFieldName> & <field.javaBitFieldMask>) == <field.javaBitFieldMask>) {
-	output.writeEnum(<field.tag>, instance.<field.javaName>, false);
+	output.writeEnum(<field.tag>, instance.<field.javaName>.getNumber(), false);
 }
 <else>
 if((instance.<field.javaBitFieldName> & <field.javaBitFieldMask>) == <field.javaBitFieldMask>) {
@@ -198,11 +179,11 @@ if((instance.<field.javaBitFieldName> & <field.javaBitFieldMask>) == <field.java
 oneof_field_write_switch(field) ::= <<
 <if(field.type.message)>
 if(instance.<field.oneof.javaCaseFieldName> == <field.oneof.javaName>.<field.javaOneofConstantName>) {
-	output.writeObject(<field.tag>, (<field.javaType>) instance.<field.oneof.javaFieldName>, <field.javaType>.getSchema(), false);
+	output.writeObject(<field.tag>, (<field.javaType>) instance.<field.oneof.javaFieldName>, <field.javaType>.SCHEMA, false);
 }
 <elseif(field.type.enum)>
 if(instance.<field.oneof.javaCaseFieldName> == <field.oneof.javaName>.<field.javaOneofConstantName>) {
-	output.writeEnum(<field.tag>, (int) instance.<field.oneof.javaFieldName>, false);
+	output.writeEnum(<field.tag>, ((<field.javaType>) instance.<field.oneof.javaFieldName>).getNumber(), false);
 }
 <else>
 if(instance.<field.oneof.javaCaseFieldName> == <field.oneof.javaName>.<field.javaOneofConstantName>) {
@@ -213,23 +194,21 @@ if(instance.<field.oneof.javaCaseFieldName> == <field.oneof.javaName>.<field.jav
 
 map_field_write_switch(field) ::= <<
 for(java.util.Map.Entry\<<field.javaMapKeyType>, <field.javaMapValueType>\> entry : instance.<field.javaName>.entrySet()) {
-    <field.javaType> value = <field.javaType>.newBuilder()
+    <field.javaType> value = <field.javaType>.create()
         .setKey(entry.getKey())
-        .setValue(entry.getValue())
-        .build();
-    output.writeObject(<field.tag>, value, <field.javaType>.getSchema(), true);
+        .setValue(entry.getValue());
+    output.writeObject(<field.tag>, value, <field.javaType>.SCHEMA, true);
 }
-
 >>
 
 repeated_field_write_switch(field) ::= <<
 <if(field.type.message)>
 for(<field.javaType> <field.javaName> : instance.<field.javaName>) {
-    output.writeObject(<field.tag>, <field.javaName>, <field.javaType>.getSchema(), true);
+    output.writeObject(<field.tag>, <field.javaName>, <field.javaType>.SCHEMA, true);
 }
 <elseif(field.type.enum)>
-for(int <field.javaName> : instance.<field.javaName>) {
-    output.writeEnum(<field.tag>, <field.javaName>, true);
+for(<field.javaType> <field.javaName> : instance.<field.javaName>) {
+    output.writeEnum(<field.tag>, <field.javaName>.getNumber(), true);
 }
 <else>
 for(<field.javaType> <field.javaName> : instance.<field.javaName>) {
@@ -238,10 +217,11 @@ for(<field.javaType> <field.javaName> : instance.<field.javaName>) {
 <endif>
 >>
 
+
 field_switch_case(field) ::= <<
-case <field.tag>: return "<field.jsonName>";
+case <field.tag>: return "<field.javaName>";
 >>
 
 field_map(field) ::= <<
-__fieldMap.put("<field.jsonName>", <field.tag>);
+__fieldMap.put("<field.javaName>", <field.tag>);
 >>

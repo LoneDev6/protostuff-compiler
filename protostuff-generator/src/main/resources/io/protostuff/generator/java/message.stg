@@ -4,8 +4,13 @@ import "io/protostuff/generator/java/generator.stg"
 import "io/protostuff/generator/java/enum.stg"
 import "io/protostuff/generator/java/schema.stg"
 import "io/protostuff/generator/java/oneof.stg"
-import "io/protostuff/generator/java/builder.stg"
-import "io/protostuff/generator/java/message-base.stg"
+
+message_compiler_enabled(message) ::= <%
+<if(message.nested)>false<else>true<endif>
+%>
+
+message_compiler_output(message) ::= "<message.proto.javaPackagePath>/<message.javaName>.java"
+message_compiler_template(message) ::= "<message:message()>"
 
 message(message) ::= <<
 package <message.proto.javaPackage>;
@@ -16,34 +21,25 @@ package <message.proto.javaPackage>;
 message_body(message) ::= <<
 <if(!message.nested)><message:generator_annotation()><endif>
 public <if(message.nested)>static <endif>final class <message.javaName>
-        <message:message_implements_clause()> {
-
-    private static final <message.javaName> DEFAULT_INSTANCE = newBuilder().build();
+        implements io.protostuff.Message\<<message.javaName>\>{
 
     <message.fields:field_declaration(); separator="\n">
-    private boolean __merge_lock = false;
     <message.javaBitFieldNames:message_bit_field(); separator="\n">
     <message.oneofs:oneof_fields(); separator="\n">
 
-    private <message.javaName>() {
+    public static final io.protostuff.Schema\<<message.javaName>\> SCHEMA = Schema.INSTANCE;
+
+    private <message.javaName> initialize() {
         <message.fields:field_initializer(); separator="\n">
+        return this;
     }
 
-    private <message.javaName>(Builder builder) {
-        __merge_lock = true;
+    public static <message.javaName> create() {
+        return create(true);
     }
 
-    public static Builder newBuilder() {
-        return new Builder();
-    }
-
-    public static <message.javaName> getDefaultInstance() {
-        return DEFAULT_INSTANCE;
-    }
-
-    public static io.protostuff.Schema\<<message.javaName>\> getSchema()
-    {
-    	return Schema.INSTANCE;
+    public static <message.javaName> create(boolean init) {
+        return init ? new <message.javaName>().initialize() : new <message.javaName>();
     }
 
     <message.fields:field_accessors(); separator="\n">
@@ -55,15 +51,44 @@ public <if(message.nested)>static <endif>final class <message.javaName>
         return Schema.INSTANCE;
     }
 
-    <equals(message=message, builder=false)>
+    @Override
+    public boolean equals(Object obj) {
+    	if (this == obj) {
+    		return true;
+    	}
+    	if (obj == null || this.getClass() != obj.getClass()) {
+    		return false;
+    	}
+    	<message.javaName> that = (<message.javaName>) obj;
+    	<if(message.hasFields)>
+    	<message.fields:field_equals_part()>
+    	<message.oneofs:oneof_field_equals_part()>
+    	return true;
+    	<else>
+    	return true;
+    	<endif>
+    }
 
-    <message:hash_code()>
+    @Override
+    public int hashCode() {
+    	<if(message.hasFields)>
+    	int result = 1;
+    	<message.fields:field_hashCode_part()>
+        <message.oneofs:oneof_field_hashCode_part()>
+    	return result;
+    	<else>
+    	return 0;
+    	<endif>
+    }
 
-    <message:to_string()>
+    @Override
+    public String toString() {
+        java.util.List\<String> parts = new java.util.ArrayList\<>();
+        <message.fields:field_toString_part()>
+        return "<message.javaName>{" + String.join(", ", parts) + "}";
+    }
 
     <message:schema()>
-
-    <message:builder()>
 
     <message.messages:message_body(); separator="\n">
     
@@ -73,44 +98,91 @@ public <if(message.nested)>static <endif>final class <message.javaName>
 }
 >>
 
-message_implements_clause(message) ::= <%
-implements io.protostuff.Message\<<message.javaName>>
-%>
+field_equals_part(field) ::= <<
+<if(!field.oneofPart)>
+if (!java.util.Objects.equals(this.<field.javaName>, that.<field.javaName>)) {
+    return false;
+}
+<endif>
+>>
+
+oneof_field_equals_part(oneof) ::= <<
+if (!(java.util.Objects.equals(this.<oneof.javaCaseFieldName>, that.<oneof.javaCaseFieldName>)
+        && java.util.Objects.equals(this.<oneof.javaFieldName>, that.<oneof.javaFieldName>))) {
+    return false;
+}
+>>
+
+field_hashCode_part(field) ::= <<
+<if(!field.oneofPart)>
+<if(!field.repeated && (field.javaIsNumericType || field.javaIsBooleanType))>
+result = 31 * result + <field.type.javaWrapperType>.hashCode(<field.javaName>);
+<else>
+result = 31 * result + (<field.javaName> == null ? 0 : <field.javaName>.hashCode());
+<endif>
+<endif>
+>>
+
+oneof_field_hashCode_part(oneof) ::= <<
+result = 31 * result + <oneof.javaCaseFieldName>.hashCode();
+result = 31 * result + (<oneof.javaFieldName> == null ? 0 : <oneof.javaFieldName>.hashCode());
+>>
+
+oneof_case(oneOf) ::= <<
+public <oneOf.javaName> <oneOf.javaCaseGetterName>() {
+    return <oneOf.javaCaseFieldName>;
+}
+>>
+
+
+oneof_fields(oneOf) ::= <<
+private <oneOf.javaName> <oneOf.javaCaseFieldName> = <oneOf.javaName>.<oneOf.javaNotSetConstantName>;
+private Object <oneOf.javaFieldName> = null;
+>>
 
 message_bit_field(name) ::= <<
 private int <name>;
 >>
 
+field_initializer(field) ::= <<
+<if(field.map)>
+if (<field.javaName> == null) {
+    <field.javaName> = java.util.Collections.synchronizedMap(new java.util.HashMap\<>());
+} else {
+    <field.javaName> = java.util.Collections.synchronizedMap(<field.javaName>);
+}
+<elseif(field.repeated)>
+if (<field.javaName> == null) {
+    <field.javaName> = java.util.Collections.synchronizedList(new java.util.ArrayList\<>());
+} else {
+    <field.javaName> = java.util.Collections.synchronizedList(<field.javaName>);
+}
+<endif>
+>>
+
+field_declaration(field) ::= <<
+<if(field.map)>
+private <field.javaMapType> <field.javaName>;
+<elseif(field.repeated)>
+private <field.javaRepeatedType> <field.javaName>;
+<else>
+private <field.javaType> <field.javaName>;
+<endif>
+>>
+
 field_accessors(field) ::= <<
 <if(field.oneofPart)>
-<if(field.type.enum)>
-public <field.javaType> <field.javaGetterName>() {
-    if (<field.oneof.javaCaseFieldName> == <field.oneof.javaName>.<field.javaOneofConstantName>) {
-        return <field.javaType>.valueOf((int) <field.oneof.javaFieldName>);
-    }
-    return <field.javaDefaultValue>;
-}
-
-public int <field.javaEnumValueGetterName>() {
-    if (<field.oneof.javaCaseFieldName> == <field.oneof.javaName>.<field.javaOneofConstantName>) {
-        return (int) <field.oneof.javaFieldName>;
-    }
-    return 0;
-}
-<else>
 public <field.javaType> <field.javaGetterName>() {
     if (<field.oneof.javaCaseFieldName> == <field.oneof.javaName>.<field.javaOneofConstantName>) {
         return (<field.javaType>) <field.oneof.javaFieldName>;
     }
     return <field.javaDefaultValue>;
 }
-<endif>
 
-public <field.parent.javaName> <field.javaWitherName>(<field.javaType> value) {
-    return <message.javaName>.newBuilder()
-        .mergeFrom(this)
-        .<field.javaSetterName>(value)
-        .build();
+public <field.parent.javaName> <field.javaSetterName>(<field.javaType> value) {
+    this.<field.oneof.javaFieldName> = value;
+    this.<field.oneof.javaCaseFieldName> = <field.oneof.javaName>.<field.javaOneofConstantName>;
+    return this;
 }
 
 public boolean <field.javaHasMethodName>() {
@@ -121,53 +193,65 @@ public <field.javaMapType> <field.javaMapGetterName>() {
     return <field.javaName>;
 }
 
+public <field.parent.javaName> <field.javaMapSetterName>(<field.javaMapType> <field.javaName>) {
+    this.<field.javaName> = <field.javaName>;
+    return this;
+}
+
+public <field.parent.javaName> <field.javaMapAdderName>(<field.javaMapKeyType> key, <field.javaMapValueType> value) {
+    if (this.<field.javaName> == null) {
+        this.<field.javaName> = new java.util.HashMap\<>();
+    }
+    this.<field.javaName>.put(key, value);
+    return this;
+}
+
 public int <field.javaRepeatedGetCountMethodName>() {
     return <field.javaName>.size();
+}
+
+public boolean <field.javaMapContainsByKeyMethodName>(<field.javaMapKeyType> key) {
+    return <field.javaName>.containsKey(key);
+}
+
+public boolean <field.javaMapContainsByValueMethodName>(<field.javaMapValueType> value) {
+    return <field.javaName>.containsValue(value);
 }
 
 public <field.javaMapValueType> <field.javaMapGetByKeyMethodName>(<field.javaMapKeyType> key) {
     return <field.javaName>.get(key);
 }
-
-public <field.parent.javaName> <field.javaWitherName>(<field.javaMapType> value) {
-    return <message.javaName>.newBuilder()
-        .mergeFrom(this)
-        .<field.javaCleanerName>()
-        .<field.javaMapAddAllName>(value)
-        .build();
+public <field.javaMapValueType> <field.javaMapRemoveMethodName>(<field.javaMapKeyType> key) {
+    return <field.javaName>.remove(key);
 }
+public boolean <field.javaMapRemoveMethodName>(<field.javaMapKeyType> key, <field.javaMapValueType> value) {
+    return <field.javaName>.remove(key, value);
+}
+
 <elseif(field.repeated)>
-<if(field.type.enum)>
-public <field.javaRepeatedType> <field.javaRepeatedGetterName>() {
-    return new io.protostuff.ListAdapter\<>(<field.javaName>, <field.javaType>::valueOf);
-}
-
-public <field.javaType> <field.javaRepeatedGetByIndexMethodName>(int index) {
-    return <field.javaType>.valueOf(<field.javaName>.get(index));
-}
-
-public java.util.List\<Integer> <field.javaRepeatedEnumValueGetterName>() {
-    return <field.javaName>;
-}
-
-public int <field.javaRepeatedEnumValueGetterByIndexName>(int index) {
-    return <field.javaName>.get(index);
-}
-
-public int <field.javaRepeatedGetCountMethodName>() {
-    return <field.javaName>.size();
-}
-
-public <field.parent.javaName> <field.javaWitherName>(<field.javaRepeatedType> value) {
-    return <message.javaName>.newBuilder()
-        .mergeFrom(this)
-        .<field.javaCleanerName>()
-        .<field.javaRepeatedAddAllName>(value)
-        .build();
-}
-<else>
 public <field.javaRepeatedType> <field.javaRepeatedGetterName>() {
     return <field.javaName>;
+}
+
+public <field.parent.javaName> <field.javaRepeatedSetterName>(<field.javaRepeatedType> <field.javaName>) {
+    this.<field.javaName> = <field.javaName>;
+    return this;
+}
+
+public <field.parent.javaName> <field.javaRepeatedAdderName>(<field.javaType> <field.javaName>) {
+    if (this.<field.javaName> == null) {
+        this.<field.javaName> = new java.util.ArrayList\<>();
+    }
+    this.<field.javaName>.add(<field.javaName>);
+    return this;
+}
+
+public <field.parent.javaName> <field.javaRepeatedAdderName>(<field.javaRepeatedType> <field.javaName>) {
+    if (this.<field.javaName> == null) {
+        this.<field.javaName> = new java.util.ArrayList\<>();
+    }
+    this.<field.javaName>.addAll(<field.javaName>);
+    return this;
 }
 
 public int <field.javaRepeatedGetCountMethodName>() {
@@ -177,48 +261,22 @@ public int <field.javaRepeatedGetCountMethodName>() {
 public <field.javaType> <field.javaRepeatedGetByIndexMethodName>(int index) {
     return <field.javaName>.get(index);
 }
-
-public <field.parent.javaName> <field.javaWitherName>(<field.javaRepeatedType> value) {
-    return <message.javaName>.newBuilder()
-        .mergeFrom(this)
-        .<field.javaCleanerName>()
-        .<field.javaRepeatedAddAllName>(value)
-        .build();
-}
-<endif>
-<elseif(field.type.enum)>
-public <field.javaType> <field.javaGetterName>() {
-    return <field.javaType>.valueOf(<field.javaName>);
-}
-
-public int <field.javaEnumValueGetterName>() {
-    return <field.javaName>;
-}
-
-public boolean <field.javaHasMethodName>() {
-    return (<field.javaBitFieldName> & <field.javaBitFieldMask>) == <field.javaBitFieldMask>;
-}
-
-public <field.parent.javaName> <field.javaWitherName>(<field.javaType> value) {
-    return <message.javaName>.newBuilder()
-        .mergeFrom(this)
-        .<field.javaSetterName>(value)
-        .build();
-}
 <else>
 public <field.javaType> <field.javaGetterName>() {
+    if ((<field.javaBitFieldName> & <field.javaBitFieldMask>) == 0) {
+        return <field.javaDefaultValue>;
+    }
     return <field.javaName>;
+}
+
+public <field.parent.javaName> <field.javaSetterName>(<field.javaType> value) {
+    this.<field.javaName> = value;
+    <field.javaBitFieldName> |= <field.javaBitFieldMask>;
+    return this;
 }
 
 public boolean <field.javaHasMethodName>() {
     return (<field.javaBitFieldName> & <field.javaBitFieldMask>) == <field.javaBitFieldMask>;
-}
-
-public <field.parent.javaName> <field.javaWitherName>(<field.javaType> value) {
-    return <message.javaName>.newBuilder()
-        .mergeFrom(this)
-        .<field.javaSetterName>(value)
-        .build();
 }
 <endif>
 >>

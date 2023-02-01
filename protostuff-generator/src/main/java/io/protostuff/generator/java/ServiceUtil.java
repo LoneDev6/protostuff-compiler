@@ -1,28 +1,19 @@
 package io.protostuff.generator.java;
 
-import io.protostuff.compiler.model.Service;
-import io.protostuff.compiler.model.ServiceMethod;
+import io.protostuff.compiler.model.*;
+import io.protostuff.compiler.model.Module;
 import io.protostuff.generator.Formatter;
 
+import java.util.Map;
+
 /**
- * Custom service properties for java code generator.
- *
  * @author Kostiantyn Shchepanovskyi
  */
 public class ServiceUtil {
-
-    private ServiceUtil() {
-        throw new IllegalAccessError("Utility class");
-    }
-
     public static String getClassName(Service service) {
-        String name = service.getName();
-        return Formatter.toPascalCase(name);
+        return service.getName();
     }
 
-    /**
-     * Returns java method name for corresponding rpc method.
-     */
     public static String getMethodName(ServiceMethod serviceMethod) {
         String name = serviceMethod.getName();
         String formattedName = Formatter.toCamelCase(name);
@@ -30,6 +21,16 @@ public class ServiceUtil {
             return formattedName + '_';
         }
         return formattedName;
+    }
+
+    public static String getAsyncReturnType(ServiceMethod serviceMethod) {
+        Service service = serviceMethod.getParent();
+        Proto proto = service.getParent();
+        Module module = proto.getModule();
+        Map<String, String> options = module.getOptions();
+        String returnType = options.get(JavaGenerator.SERVICE_RETURN_TYPE_OPTION);
+        String type = UserTypeUtil.getCanonicalName(serviceMethod.getReturnType());
+        return returnType + "<" + type + ">";
     }
 
     private static boolean isReservedKeyword(String formattedName) {
