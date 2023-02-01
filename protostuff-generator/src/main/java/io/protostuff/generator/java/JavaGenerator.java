@@ -3,6 +3,7 @@ package io.protostuff.generator.java;
 import com.google.common.collect.ImmutableMap;
 import io.protostuff.compiler.model.Enum;
 import io.protostuff.compiler.model.*;
+import io.protostuff.compiler.model.Module;
 import io.protostuff.generator.ObjectExtender;
 import io.protostuff.generator.ProtoCompiler;
 import io.protostuff.generator.SimpleObjectExtender;
@@ -71,6 +72,10 @@ public class JavaGenerator implements ProtoCompiler {
                         .property("javaRepeatedGetCountMethodName", MessageFieldUtil::repeatedGetCountMethodName)
                         .property("javaRepeatedGetByIndexMethodName", MessageFieldUtil::repeatedGetByIndexMethodName)
                         .property("javaMapGetByKeyMethodName", MessageFieldUtil::mapGetByKeyMethodName)
+                        .property("javaMapContainsByKeyMethodName", MessageFieldUtil::mapContainsKeyMethodName)
+                        .property("javaMapContainsByValueMethodName", MessageFieldUtil::mapContainsValueMethodName)
+                        .property("javaMapRemoveByKeyMethodName", MessageFieldUtil::mapRemoveByKeyMethodName)
+                        .property("javaMapRemoveMethodName", MessageFieldUtil::mapRemoveMethodName)
                         .property("protostuffReadMethod", MessageFieldUtil::protostuffReadMethod)
                         .property("protostuffWriteMethod", MessageFieldUtil::protostuffWriteMethod)
                         .property("toStringPart", MessageFieldUtil::toStringPart)

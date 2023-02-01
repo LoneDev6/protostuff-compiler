@@ -23,6 +23,8 @@ public class MessageFieldUtil {
     public static final String NULL = "null";
     public static final String MAP_SUFFIX = "Map";
     public static final String PUT_PREFIX = "put";
+    public static final String CONTAINS_PREFIX = "contains";
+    public static final String REMOVE_PREFIX = "remove";
 
     public static String getFieldType(Field field) {
         FieldType type = field.getType();
@@ -339,6 +341,34 @@ public class MessageFieldUtil {
     public static String mapGetByKeyMethodName(Field field) {
         if (field.isMap()) {
             return GETTER_PREFIX + Formatter.toPascalCase(field.getName());
+        }
+        throw new IllegalArgumentException(field.toString());
+    }
+
+    public static String mapContainsKeyMethodName(Field field) {
+        if (field.isMap()) {
+            return CONTAINS_PREFIX + "Key" + Formatter.toPascalCase(field.getName());
+        }
+        throw new IllegalArgumentException(field.toString());
+    }
+
+    public static String mapContainsValueMethodName(Field field) {
+        if (field.isMap()) {
+            return CONTAINS_PREFIX + "Value" + Formatter.toPascalCase(field.getName());
+        }
+        throw new IllegalArgumentException(field.toString());
+    }
+
+    public static String mapRemoveByKeyMethodName(Field field) {
+        if (field.isMap()) {
+            return REMOVE_PREFIX + Formatter.toPascalCase(field.getName()) + "ByKey";
+        }
+        throw new IllegalArgumentException(field.toString());
+    }
+
+    public static String mapRemoveMethodName(Field field) {
+        if (field.isMap()) {
+            return REMOVE_PREFIX + Formatter.toPascalCase(field.getName());
         }
         throw new IllegalArgumentException(field.toString());
     }

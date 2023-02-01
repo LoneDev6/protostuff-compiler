@@ -1,6 +1,7 @@
 package io.protostuff.generator.java;
 
 import io.protostuff.compiler.model.*;
+import io.protostuff.compiler.model.Module;
 import io.protostuff.generator.Formatter;
 
 import java.util.Map;

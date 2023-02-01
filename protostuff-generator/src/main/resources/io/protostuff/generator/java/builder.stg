@@ -55,7 +55,7 @@ builder_field_accessors(field) ::= <<
 <if(field.repeated)>
 public <field.javaRepeatedType> <field.javaBuilderRepeatedGetterName>() {
     if (this.<field.javaName> == null) {
-        return java.util.Collections.emptyList();
+        return java.util.Collections.synchronizedList(new java.util.ArrayList<>());
     }
     return java.util.Collections.synchronizedList(this.<field.javaName>);    
 }
