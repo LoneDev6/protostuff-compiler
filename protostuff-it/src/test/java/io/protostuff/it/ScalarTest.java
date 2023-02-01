@@ -23,7 +23,7 @@ public class ScalarTest {
 
     @Test
     public void scalarDefaultValues() throws Exception {
-        ScalarFieldTestMsg msg = ScalarFieldTestMsg.newBuilder().build();
+        ScalarFieldTestMsg msg = ScalarFieldTestMsg.create();
         assertEquals(0d, msg.getDouble(), 0d);
         assertEquals(0f, msg.getFloat(), 0f);
         assertEquals(0, (int) msg.getInt32());
@@ -43,7 +43,7 @@ public class ScalarTest {
 
     @Test
     public void scalarConstructedObject() throws Exception {
-        ScalarFieldTestMsg msg = ScalarFieldTestMsg.newBuilder()
+        ScalarFieldTestMsg msg = ScalarFieldTestMsg.create()
                 .setDouble(0.1d)
                 .setFloat(0.2f)
                 .setInt32(3)
@@ -59,7 +59,7 @@ public class ScalarTest {
                 .setBool(true)
                 .setString("string")
                 .setBytes(ByteString.copyFrom(new byte[]{1, 2, 3}))
-                .build();
+                ;
         assertEquals(0.1d, msg.getDouble(), 0d);
         assertEquals(0.2f, msg.getFloat(), 0f);
         assertEquals(3, (int) msg.getInt32());
@@ -79,7 +79,7 @@ public class ScalarTest {
 
     @Test
     public void scalarGetters() throws Exception {
-        ScalarFieldTestMsg msg = ScalarFieldTestMsg.newBuilder()
+        ScalarFieldTestMsg msg = ScalarFieldTestMsg.create()
                 .setDouble(0.1d)
                 .setFloat(0.2f);
         assertEquals(0.1d, msg.getDouble(), 0d);
@@ -88,16 +88,15 @@ public class ScalarTest {
 
     @Test
     public void repeatedScalarDefaultValues() throws Exception {
-        RepeatedScalarFieldTestMsg msg = RepeatedScalarFieldTestMsg.newBuilder().build();
+        RepeatedScalarFieldTestMsg msg = RepeatedScalarFieldTestMsg.create();
         assertEquals(0, msg.getDoubleCount());
-        assertEquals(Collections.emptyList(), msg.getDoubleList());
+        assertEquals(Collections.emptyList(), msg.getDouble());
     }
 
     @Test
     public void repeatedScalarConstructedObject_usingSetter() throws Exception {
-        RepeatedScalarFieldTestMsg msg = RepeatedScalarFieldTestMsg.newBuilder()
-                .setInt32List(Arrays.asList(1, 2, 3))
-                .build();
+        RepeatedScalarFieldTestMsg msg = RepeatedScalarFieldTestMsg.create()
+                .setInt32(Arrays.asList(1, 2, 3));
         assertEquals(3, msg.getInt32Count());
         assertEquals(1, (int) msg.getInt32(0));
         assertEquals(2, (int) msg.getInt32(1));
@@ -106,25 +105,13 @@ public class ScalarTest {
 
     @Test
     public void repeatedScalarConstructedObject_usingAdder() throws Exception {
-        RepeatedScalarFieldTestMsg msg = RepeatedScalarFieldTestMsg.newBuilder()
+        RepeatedScalarFieldTestMsg msg = RepeatedScalarFieldTestMsg.create()
                 .addInt32(1)
                 .addInt32(2)
-                .addInt32(3)
-                .build();
+                .addInt32(3);
         assertEquals(3, msg.getInt32Count());
         assertEquals(1, (int) msg.getInt32(0));
         assertEquals(2, (int) msg.getInt32(1));
         assertEquals(3, (int) msg.getInt32(2));
-    }
-
-    @Test
-    public void repeatedScalarConstructedObject_ListIsImmutable() throws Exception {
-        RepeatedScalarFieldTestMsg msg = RepeatedScalarFieldTestMsg.newBuilder()
-                .addInt32(1)
-                .addInt32(2)
-                .addInt32(3)
-                .build();
-        thrown.expect(UnsupportedOperationException.class);
-        msg.getInt32List().add(4);
     }
 }

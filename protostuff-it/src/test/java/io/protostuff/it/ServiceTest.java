@@ -26,7 +26,7 @@ public class ServiceTest {
 
         @Override
         public CompletableFuture<ResponseMessage> test(RequestMessage request) {
-            ResponseMessage responseMessage = ResponseMessage.newBuilder().build();
+            ResponseMessage responseMessage = ResponseMessage.create();
             return CompletableFuture.completedFuture(responseMessage);
         }
     }
@@ -39,7 +39,7 @@ public class ServiceTest {
 
     @Test
     public void simpleSignatureCheck() throws Exception {
-        CompletableFuture<ResponseMessage> result = new TestServiceImpl().test(RequestMessage.newBuilder().build());
+        CompletableFuture<ResponseMessage> result = new TestServiceImpl().test(RequestMessage.create());
         Assert.assertTrue(result.isDone());
     }
 

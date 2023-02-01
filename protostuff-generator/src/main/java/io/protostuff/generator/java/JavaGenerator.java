@@ -74,7 +74,6 @@ public class JavaGenerator implements ProtoCompiler {
                         .property("javaMapGetByKeyMethodName", MessageFieldUtil::mapGetByKeyMethodName)
                         .property("javaMapContainsByKeyMethodName", MessageFieldUtil::mapContainsKeyMethodName)
                         .property("javaMapContainsByValueMethodName", MessageFieldUtil::mapContainsValueMethodName)
-                        .property("javaMapRemoveByKeyMethodName", MessageFieldUtil::mapRemoveByKeyMethodName)
                         .property("javaMapRemoveMethodName", MessageFieldUtil::mapRemoveMethodName)
                         .property("protostuffReadMethod", MessageFieldUtil::protostuffReadMethod)
                         .property("protostuffWriteMethod", MessageFieldUtil::protostuffWriteMethod)

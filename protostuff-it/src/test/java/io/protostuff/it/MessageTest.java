@@ -22,33 +22,27 @@ public class MessageTest {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-    public static final SimpleMessage A = SimpleMessage.newBuilder()
+    public static final SimpleMessage A = SimpleMessage.create()
             .setInt32(42)
-            .setString("abra")
-            .build();
-    public static final SimpleMessage A_COPY = SimpleMessage.newBuilder()
+            .setString("abra");
+    public static final SimpleMessage A_COPY = SimpleMessage.create()
             .setInt32(42)
-            .setString("abra")
-            .build();
-    public static final SimpleMessage B = SimpleMessage.newBuilder()
+            .setString("abra");
+    public static final SimpleMessage B = SimpleMessage.create()
             .setInt32(43)
-            .setString("cadabra")
-            .build();
-    public static final TestMap TEST_MAP = TestMap.newBuilder()
+            .setString("cadabra");
+    public static final TestMap TEST_MAP = TestMap.create()
             .putMapStringString("key", "value")
-            .putMapStringString("test", "test")
-            .build();
+            .putMapStringString("test", "test");
 
     @Test
     public void createdInstance() throws Exception {
-        ParentMsg instance = ParentMsg.newBuilder()
-                .setNestedMsg(NestedMsg.newBuilder()
-                        .setName("1")
-                        .build())
-                .addNestedRepeatedMsg(NestedMsg.newBuilder()
-                        .setName("2")
-                        .build())
-                .build();
+        ParentMsg instance = ParentMsg.create()
+                .setNestedMsg(NestedMsg.create()
+                        .setName("1"))
+                .addNestedRepeatedMsg(NestedMsg.create()
+                        .setName("2"))
+                ;
         assertTrue(instance.hasNestedMsg());
         assertEquals("1", instance.getNestedMsg().getName());
         assertEquals(1, instance.getNestedRepeatedMsgCount());
@@ -74,80 +68,52 @@ public class MessageTest {
 
     @Test
     public void testToString_integer_field() throws Exception {
-        SimpleMessage message = SimpleMessage.newBuilder()
+        SimpleMessage message = SimpleMessage.create()
                 .setInt32(15)
-                .build();
+                ;
         assertEquals("SimpleMessage{int32=15}", message.toString());
     }
 
     @Test
     public void testToString_string_field() throws Exception {
-        SimpleMessage message = SimpleMessage.newBuilder()
+        SimpleMessage message = SimpleMessage.create()
                 .setString("test")
-                .build();
+                ;
         assertEquals("SimpleMessage{string=test}", message.toString());
     }
 
     @Test
     public void testToString_message_field() throws Exception {
-        SimpleMessage message = SimpleMessage.newBuilder()
-                .setMessage(TestMessage.newBuilder()
+        SimpleMessage message = SimpleMessage.create()
+                .setMessage(TestMessage.create()
                         .setA(123)
-                        .build())
-                .build();
+                        )
+                ;
         assertEquals("SimpleMessage{message=TestMessage{a=123}}", message.toString());
     }
 
     @Test
     public void testToString_repeated_string_field() throws Exception {
-        SimpleMessage message = SimpleMessage.newBuilder()
+        SimpleMessage message = SimpleMessage.create()
                 .addRepeatedString("test1")
                 .addRepeatedString("test2")
-                .build();
+                ;
         assertEquals("SimpleMessage{repeatedString=[test1, test2]}", message.toString());
     }
 
     @Test
     public void testToString_repeated_int32_field() throws Exception {
-        SimpleMessage message = SimpleMessage.newBuilder()
+        SimpleMessage message = SimpleMessage.create()
                 .addRepeatedInt32(41)
                 .addRepeatedInt32(42)
-                .build();
+                ;
         assertEquals("SimpleMessage{repeatedInt32=[41, 42]}", message.toString());
     }
 
     @Test
     public void testToString_MessageWithoutFields() throws Exception {
-        MessageWithoutFields message = MessageWithoutFields.newBuilder().build();
+        MessageWithoutFields message = MessageWithoutFields.create();
         assertEquals("MessageWithoutFields{}", message.toString());
-    }
-
-    @Test
-    public void testModifyConstructedMessage_normal_setter() throws Exception {
-        SimpleMessage message = SimpleMessage.newBuilder().build();
-        thrown.expect(IllegalStateException.class);
-        message.setInt32(1);
-    }
-
-    @Test
-    public void testModifyConstructedMessage_repeated_setter() throws Exception {
-        SimpleMessage message = SimpleMessage.newBuilder().build();
-        thrown.expect(IllegalStateException.class);
-        message.setRepeatedInt32List(Collections.emptyList());
-    }
-
-    @Test
-    public void testModifyConstructedMessage_adder_single() throws Exception {
-        SimpleMessage message = SimpleMessage.newBuilder().build();
-        thrown.expect(IllegalStateException.class);
-        message.addRepeatedInt32(1);
-    }
-
-    @Test
-    public void testModifyConstructedMessage_adder_list() throws Exception {
-        SimpleMessage message = SimpleMessage.newBuilder().build();
-        thrown.expect(IllegalStateException.class);
-        message.addRepeatedInt32(1);
     }
 
     @Test
@@ -155,7 +121,7 @@ public class MessageTest {
         Map<String, String> expected = new HashMap<>();
         expected.put("key", "value");
         expected.put("test", "test");
-        Assert.assertEquals(expected, TEST_MAP.getMapStringStringMap());
+        Assert.assertEquals(expected, TEST_MAP.getMapStringString());
     }
 
     @Test
@@ -173,30 +139,15 @@ public class MessageTest {
         Map<String, String> map = new HashMap<>();
         map.put("key", "value");
         map.put("test", "test");
-        TestMap instance = TestMap.newBuilder()
-                .setMapStringStringMap(map)
-                .build();
-        Assert.assertEquals(map, instance.getMapStringStringMap());
-    }
-
-    @Test
-    public void testModifyConstructedMap_setter_map() throws Exception {
-        Map<String, String> map = new HashMap<>();
-        map.put("key", "value");
-        map.put("test", "test");
-        thrown.expect(IllegalStateException.class);
-        TEST_MAP.setMapStringStringMap(map);
-    }
-
-    @Test
-    public void testMap_setter_single() throws Exception {
-        thrown.expect(IllegalStateException.class);
-        TEST_MAP.putMapStringString("a", "b");
+        TestMap instance = TestMap.create()
+                .setMapStringString(map)
+                ;
+        Assert.assertEquals(map, instance.getMapStringString());
     }
 
     @Test
     public void testOneof_default_value() throws Exception {
-        TestOneof testOneof = TestOneof.newBuilder().build();
+        TestOneof testOneof = TestOneof.create();
         assertEquals(ONEOF_NAME_NOT_SET, testOneof.getOneofNameCase());
         assertFalse(testOneof.hasFooInt());
         assertFalse(testOneof.hasFooString());
@@ -206,9 +157,9 @@ public class MessageTest {
 
     @Test
     public void testOneof_set_value() throws Exception {
-        TestOneof testOneof = TestOneof.newBuilder()
+        TestOneof testOneof = TestOneof.create()
                 .setFooInt(42)
-                .build();
+                ;
         assertEquals(FOO_INT, testOneof.getOneofNameCase());
         assertTrue(testOneof.hasFooInt());
         assertFalse(testOneof.hasFooString());
@@ -218,39 +169,39 @@ public class MessageTest {
 
     @Test
     public void testOneof_equals() throws Exception {
-        TestOneof a1 = TestOneof.newBuilder()
+        TestOneof a1 = TestOneof.create()
                 .setFooInt(42)
-                .build();
-        TestOneof a2 = TestOneof.newBuilder()
+                ;
+        TestOneof a2 = TestOneof.create()
                 .setFooInt(42)
-                .build();
-        TestOneof b = TestOneof.newBuilder()
+                ;
+        TestOneof b = TestOneof.create()
                 .setFooString("test")
-                .build();
+                ;
         assertEquals(a1, a2);
         assertNotEquals(a1, b);
     }
 
     @Test
     public void testOneof_hashCode() throws Exception {
-        TestOneof a1 = TestOneof.newBuilder()
+        TestOneof a1 = TestOneof.create()
                 .setFooInt(42)
-                .build();
-        TestOneof a2 = TestOneof.newBuilder()
+                ;
+        TestOneof a2 = TestOneof.create()
                 .setFooInt(42)
-                .build();
-        TestOneof b = TestOneof.newBuilder()
+                ;
+        TestOneof b = TestOneof.create()
                 .setFooString("test")
-                .build();
+                ;
         assertEquals(a1.hashCode(), a2.hashCode());
         assertNotEquals(a1.hashCode(), b.hashCode());
     }
 
     @Test
     public void testOneof_toString() throws Exception {
-        TestOneof a1 = TestOneof.newBuilder()
+        TestOneof a1 = TestOneof.create()
                 .setFooInt(42)
-                .build();
+                ;
         assertEquals("TestOneof{fooInt=42}", a1.toString());
     }
 

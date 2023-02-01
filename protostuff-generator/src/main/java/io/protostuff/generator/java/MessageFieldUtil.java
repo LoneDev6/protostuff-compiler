@@ -19,11 +19,9 @@ public class MessageFieldUtil {
     public static final String GETTER_PREFIX = "get";
     public static final String SETTER_PREFIX = "set";
     public static final String LIST = "java.util.List";
-    public static final String GETTER_REPEATED_SUFFIX = "List";
     public static final String NULL = "null";
-    public static final String MAP_SUFFIX = "Map";
     public static final String PUT_PREFIX = "put";
-    public static final String CONTAINS_PREFIX = "contains";
+    public static final String ADD_PREFIX = "add";
     public static final String REMOVE_PREFIX = "remove";
 
     public static String getFieldType(Field field) {
@@ -110,14 +108,14 @@ public class MessageFieldUtil {
 
     public static String getRepeatedFieldGetterName(Field field) {
         if (field.isRepeated()) {
-            return GETTER_PREFIX + Formatter.toPascalCase(field.getName()) + GETTER_REPEATED_SUFFIX;
+            return GETTER_PREFIX + Formatter.toPascalCase(field.getName());
         }
         throw new IllegalArgumentException(field.toString());
     }
 
     public static String getRepeatedFieldSetterName(Field field) {
         if (field.isRepeated()) {
-            return SETTER_PREFIX + Formatter.toPascalCase(field.getName()) + GETTER_REPEATED_SUFFIX;
+            return SETTER_PREFIX + Formatter.toPascalCase(field.getName());
         }
         throw new IllegalArgumentException(field.toString());
     }
@@ -145,7 +143,7 @@ public class MessageFieldUtil {
     }
 
     public static String getRepeatedFieldAdderName(Field field) {
-        return "add" + Formatter.toPascalCase(field.getName());
+        return ADD_PREFIX + Formatter.toPascalCase(field.getName());
     }
 
     public static String toStringPart(Field field) {
@@ -326,14 +324,14 @@ public class MessageFieldUtil {
 
     public static String getMapGetterName(Field field) {
         if (field.isMap()) {
-            return GETTER_PREFIX + Formatter.toPascalCase(field.getName()) + MAP_SUFFIX;
+            return GETTER_PREFIX + Formatter.toPascalCase(field.getName());
         }
         throw new IllegalArgumentException(field.toString());
     }
 
     public static String getMapSetterName(Field field) {
         if (field.isMap()) {
-            return SETTER_PREFIX + Formatter.toPascalCase(field.getName()) + MAP_SUFFIX;
+            return SETTER_PREFIX + Formatter.toPascalCase(field.getName());
         }
         throw new IllegalArgumentException(field.toString());
     }
@@ -347,21 +345,14 @@ public class MessageFieldUtil {
 
     public static String mapContainsKeyMethodName(Field field) {
         if (field.isMap()) {
-            return CONTAINS_PREFIX + "Key" + Formatter.toPascalCase(field.getName());
+            return HAS_PREFIX + "Key" + Formatter.toPascalCase(field.getName());
         }
         throw new IllegalArgumentException(field.toString());
     }
 
     public static String mapContainsValueMethodName(Field field) {
         if (field.isMap()) {
-            return CONTAINS_PREFIX + "Value" + Formatter.toPascalCase(field.getName());
-        }
-        throw new IllegalArgumentException(field.toString());
-    }
-
-    public static String mapRemoveByKeyMethodName(Field field) {
-        if (field.isMap()) {
-            return REMOVE_PREFIX + Formatter.toPascalCase(field.getName()) + "ByKey";
+            return HAS_PREFIX + "Value" + Formatter.toPascalCase(field.getName());
         }
         throw new IllegalArgumentException(field.toString());
     }

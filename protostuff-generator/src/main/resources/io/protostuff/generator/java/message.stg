@@ -27,27 +27,24 @@ public <if(message.nested)>static <endif>final class <message.javaName>
     <message.javaBitFieldNames:message_bit_field(); separator="\n">
     <message.oneofs:oneof_fields(); separator="\n">
 
-    private void initialize() {
+    public static final io.protostuff.Schema\<<message.javaName>\> SCHEMA = Schema.INSTANCE;
+
+    private <message.javaName> initialize() {
         <message.fields:field_initializer(); separator="\n">
+        return this;
     }
 
-    public static <message.javaName> newBuilder() {
-        return new <message.javaName>();
+    public static <message.javaName> create() {
+        return create(true);
     }
 
-    public static io.protostuff.Schema\<<message.javaName>\> getSchema()
-    {
-    	return Schema.INSTANCE;
+    public static <message.javaName> create(boolean init) {
+        return init ? new <message.javaName>().initialize() : new <message.javaName>();
     }
 
     <message.fields:field_accessors(); separator="\n">
 
     <message.oneofs:oneof_case(); separator="\n">
-
-    public <message.javaName> build() {
-        initialize();
-        return this;
-    }
 
     @Override
     public io.protostuff.Schema\<<message.javaName>\> cachedSchema() {
@@ -224,14 +221,13 @@ public boolean <field.javaMapContainsByValueMethodName>(<field.javaMapValueType>
 public <field.javaMapValueType> <field.javaMapGetByKeyMethodName>(<field.javaMapKeyType> key) {
     return <field.javaName>.get(key);
 }
-
-public <field.javaMapValueType> <field.javaMapRemoveByKeyMethodName>(<field.javaMapKeyType> key) {
+public <field.javaMapValueType> <field.javaMapRemoveMethodName>(<field.javaMapKeyType> key) {
     return <field.javaName>.remove(key);
 }
-
-public <field.javaMapValueType> <field.javaMapRemoveMethodName>(<field.javaMapValueType> value) {
-    return <field.javaName>.remove(value);
+public boolean <field.javaMapRemoveMethodName>(<field.javaMapKeyType> key, <field.javaMapValueType> value) {
+    return <field.javaName>.remove(key, value);
 }
+
 <elseif(field.repeated)>
 public <field.javaRepeatedType> <field.javaRepeatedGetterName>() {
     return <field.javaName>;

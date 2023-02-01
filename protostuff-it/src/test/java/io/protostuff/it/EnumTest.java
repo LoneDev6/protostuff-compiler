@@ -13,7 +13,7 @@ public class EnumTest {
 
     @Test
     public void defaultFieldValue() throws Exception {
-        ParentEnumMsg msg = ParentEnumMsg.newBuilder().build();
+        ParentEnumMsg msg = ParentEnumMsg.create();
         Assert.assertEquals(NestedEnum.UNKNOWN, msg.getNestedEnum());
     }
 }

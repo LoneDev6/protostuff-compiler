@@ -53,6 +53,14 @@ message SimpleMessage {
     TestMessage message = 14;
 }
 
+message SimpleMessage2 {
+    int32 id = 10;
+    string name = 11;
+    repeated int32 numbers = 12;
+    repeated string descriptions = 13;
+    map<string, string> items = 1;
+}
+
 message MessageWithoutFields {
 
 }

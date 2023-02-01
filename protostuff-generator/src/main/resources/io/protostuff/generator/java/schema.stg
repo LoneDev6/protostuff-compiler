@@ -92,7 +92,7 @@ case <field.tag>:
 
 singular_field_merge_switch(field) ::= <<
 <if(field.type.message)>
-instance.<field.javaName> = input.mergeObject(instance.<field.javaName>, <field.javaType>.getSchema());
+instance.<field.javaName> = input.mergeObject(instance.<field.javaName>, <field.javaType>.SCHEMA);
 <elseif(field.type.enum)>
 instance.<field.javaName> = <field.javaType>.valueOf(input.readEnum());
 <else>
@@ -104,7 +104,7 @@ instance.<field.javaBitFieldName> |= <field.javaBitFieldMask>;
 oneof_field_merge_switch(field) ::= <<
 {
     <if(field.type.message)>
-    instance.<field.oneof.javaFieldName> = input.mergeObject(instance.<field.javaName>, <field.javaType>.getSchema());
+    instance.<field.oneof.javaFieldName> = input.mergeObject(instance.<field.javaName>, <field.javaType>.SCHEMA);
     <elseif(field.type.enum)>
     instance.<field.oneof.javaFieldName> = <field.javaType>.valueOf(input.readEnum());
     <else>
@@ -119,7 +119,7 @@ map_field_merge_switch(field) ::= <<
     if(instance.<field.javaName> == null) {
         instance.<field.javaName> = new java.util.HashMap\<>();
     }
-    <field.javaType> entry = input.mergeObject(null, <field.javaType>.getSchema());
+    <field.javaType> entry = input.mergeObject(null, <field.javaType>.SCHEMA);
     instance.<field.javaName>.put(entry.getKey(), entry.getValue());
 }
 >>
@@ -129,7 +129,7 @@ repeated_field_merge_switch(field) ::= <<
 if(instance.<field.javaName> == null) {
 	instance.<field.javaName> = new java.util.ArrayList\<>();
 }
-instance.<field.javaName>.add(input.mergeObject(null, <field.javaType>.getSchema()));
+instance.<field.javaName>.add(input.mergeObject(null, <field.javaType>.SCHEMA));
 <elseif(field.type.enum)>
 if(instance.<field.javaName> == null) {
 	instance.<field.javaName> = new java.util.ArrayList\<>();
@@ -158,7 +158,7 @@ field_write_switch(field) ::= <%
 singular_field_write_switch(field) ::= <<
 <if(field.type.message)>
 if((instance.<field.javaBitFieldName> & <field.javaBitFieldMask>) == <field.javaBitFieldMask>) {
-	output.writeObject(<field.tag>, instance.<field.javaName>, <field.javaType>.getSchema(), false);
+	output.writeObject(<field.tag>, instance.<field.javaName>, <field.javaType>.SCHEMA, false);
 }
 <elseif(field.type.map)>
 if((instance.<field.javaBitFieldName> & <field.javaBitFieldMask>) == <field.javaBitFieldMask>) {
@@ -179,7 +179,7 @@ if((instance.<field.javaBitFieldName> & <field.javaBitFieldMask>) == <field.java
 oneof_field_write_switch(field) ::= <<
 <if(field.type.message)>
 if(instance.<field.oneof.javaCaseFieldName> == <field.oneof.javaName>.<field.javaOneofConstantName>) {
-	output.writeObject(<field.tag>, (<field.javaType>) instance.<field.oneof.javaFieldName>, <field.javaType>.getSchema(), false);
+	output.writeObject(<field.tag>, (<field.javaType>) instance.<field.oneof.javaFieldName>, <field.javaType>.SCHEMA, false);
 }
 <elseif(field.type.enum)>
 if(instance.<field.oneof.javaCaseFieldName> == <field.oneof.javaName>.<field.javaOneofConstantName>) {
@@ -194,18 +194,17 @@ if(instance.<field.oneof.javaCaseFieldName> == <field.oneof.javaName>.<field.jav
 
 map_field_write_switch(field) ::= <<
 for(java.util.Map.Entry\<<field.javaMapKeyType>, <field.javaMapValueType>\> entry : instance.<field.javaName>.entrySet()) {
-    <field.javaType> value = <field.javaType>.newBuilder()
+    <field.javaType> value = <field.javaType>.create()
         .setKey(entry.getKey())
-        .setValue(entry.getValue())
-        .build();
-    output.writeObject(<field.tag>, value, <field.javaType>.getSchema(), true);
+        .setValue(entry.getValue());
+    output.writeObject(<field.tag>, value, <field.javaType>.SCHEMA, true);
 }
 >>
 
 repeated_field_write_switch(field) ::= <<
 <if(field.type.message)>
 for(<field.javaType> <field.javaName> : instance.<field.javaName>) {
-    output.writeObject(<field.tag>, <field.javaName>, <field.javaType>.getSchema(), true);
+    output.writeObject(<field.tag>, <field.javaName>, <field.javaType>.SCHEMA, true);
 }
 <elseif(field.type.enum)>
 for(<field.javaType> <field.javaName> : instance.<field.javaName>) {

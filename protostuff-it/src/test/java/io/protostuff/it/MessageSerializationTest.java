@@ -18,26 +18,22 @@ import java.io.ByteArrayOutputStream;
  */
 public class MessageSerializationTest {
 
-    private static final Schema<SimpleMessage> SCHEMA = SimpleMessage.getSchema();
+    private static final Schema<SimpleMessage> SCHEMA = SimpleMessage.SCHEMA;
 
     private static final String SCALARS_JSON = "{\"int32\":42,\"string\":\"xxx\"}";
-    private static final SimpleMessage SCALARS_MESSAGE =SimpleMessage.newBuilder()
+    private static final SimpleMessage SCALARS_MESSAGE = SimpleMessage.create()
             .setInt32(42)
-            .setString("xxx")
-            .build();
+            .setString("xxx");
     private static final String REPEATED_JSON = "{\"repeatedInt32\":[42,43],\"repeatedString\":[\"line1\",\"line2\"]}";
-    private static final SimpleMessage REPEATED_MESSAGE =SimpleMessage.newBuilder()
+    private static final SimpleMessage REPEATED_MESSAGE = SimpleMessage.create()
             .addRepeatedInt32(42)
             .addRepeatedInt32(43)
             .addRepeatedString("line1")
-            .addRepeatedString("line2")
-            .build();
+            .addRepeatedString("line2");
     private static final String NESTED_JSON = "{\"message\":{\"a\":3}}";
-    private static final SimpleMessage NESTED_MESSAGE =SimpleMessage.newBuilder()
-            .setMessage(TestMessage.newBuilder()
-                    .setA(3)
-                    .build())
-            .build();
+    private static final SimpleMessage NESTED_MESSAGE = SimpleMessage.create()
+            .setMessage(TestMessage.create()
+            .setA(3));
 
     @Test
     public void scalars_serialize() throws Exception {
@@ -86,21 +82,19 @@ public class MessageSerializationTest {
 
     @Test
     public void map_serialization_deserialization() throws Exception {
-        SimpleMessage simpleMessage = SimpleMessage.newBuilder()
-                .setInt32(5)
-                .build();
-        TestMap container = TestMap.newBuilder()
+        SimpleMessage simpleMessage = SimpleMessage.create()
+                .setInt32(5);
+        TestMap container = TestMap.create()
                 .putMapBoolBool(true, true)
                 .putMapBoolBool(false, false)
                 .putMapInt32Int32(43, 42)
                 .putMapInt32Int32(1, 0)
-                .putMapStringSimpleMessage("key", simpleMessage)
-                .build();
+                .putMapStringSimpleMessage("key", simpleMessage);
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        ProtobufIOUtil.writeTo(stream, container, TestMap.getSchema(), LinkedBuffer.allocate());
+        ProtobufIOUtil.writeTo(stream, container, TestMap.SCHEMA, LinkedBuffer.allocate());
         byte[] bytes = stream.toByteArray();
-        TestMap newInstance = TestMap.getSchema().newMessage();
-        ProtobufIOUtil.mergeFrom(bytes, newInstance, TestMap.getSchema());
+        TestMap newInstance = TestMap.SCHEMA.newMessage();
+        ProtobufIOUtil.mergeFrom(bytes, newInstance, TestMap.SCHEMA);
         Assert.assertEquals(true, newInstance.getMapBoolBool(true));
         Assert.assertEquals(false, newInstance.getMapBoolBool(false));
         Assert.assertEquals(42, newInstance.getMapInt32Int32(43).intValue());
@@ -111,14 +105,13 @@ public class MessageSerializationTest {
 
     @Test
     public void testOneof_serialization_deserialization() throws Exception {
-        TestOneof a = TestOneof.newBuilder()
-                .setFooString("abra")
-                .build();
+        TestOneof a = TestOneof.create()
+                .setFooString("abra");
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        ProtobufIOUtil.writeTo(stream, a, TestOneof.getSchema(), LinkedBuffer.allocate());
+        ProtobufIOUtil.writeTo(stream, a, TestOneof.SCHEMA, LinkedBuffer.allocate());
         byte[] bytes = stream.toByteArray();
-        TestOneof newInstance = TestOneof.getSchema().newMessage();
-        ProtobufIOUtil.mergeFrom(bytes, newInstance, TestOneof.getSchema());
+        TestOneof newInstance = TestOneof.SCHEMA.newMessage();
+        ProtobufIOUtil.mergeFrom(bytes, newInstance, TestOneof.SCHEMA);
         Assert.assertEquals(a, newInstance);
     }
 }
