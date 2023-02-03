@@ -8,20 +8,35 @@ Protocol Buffers parser and code generator
 Add this to your maven plugins of your project.
 
 ```xml
-<plugin>
-    <groupId>io.protostuff</groupId>
-    <artifactId>protostuff-maven-plugin</artifactId>
-    <version>2.0.0-alpha4-mutable-1.0.1</version>
-    <executions>
-        <execution>
-            <id>generate-sources</id>
-            <phase>generate-sources</phase>
-            <goals>
-                <goal>java</goal>
-            </goals>
-        </execution>
-    </executions>
-</plugin>
+<project>
+    
+    <pluginRepositories>
+        <pluginRepository>
+            <id>github</id>
+            <url>https://maven.pkg.github.com/LoneDev6/protostuff-compiler</url>
+        </pluginRepository>
+    </pluginRepositories>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>io.protostuff</groupId>
+                <artifactId>protostuff-maven-plugin</artifactId>
+                <version>2.0.0-alpha4-mutable-1.0.1</version>
+                <executions>
+                    <execution>
+                        <id>generate-sources</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    
+</project>
 ```
 
 Add these dependencies to your project
@@ -38,6 +53,47 @@ Add these dependencies to your project
     <version>1.7.4</version>
 </dependency>
 ```
+
+Open your `.m2/settings.xml` file (or create it) and add this (took from the [Github official tutorial](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-apache-maven-registry#authenticating-with-a-personal-access-token))
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+
+  <activeProfiles>
+    <activeProfile>github</activeProfile>
+  </activeProfiles>
+
+  <profiles>
+    <profile>
+      <id>github</id>
+      <repositories>
+        <repository>
+          <id>central</id>
+          <url>https://repo1.maven.org/maven2</url>
+        </repository>
+        <repository>
+          <id>github</id>
+          <url>https://maven.pkg.github.com/LoneDev/protostuff-compiler</url>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </repository>
+      </repositories>
+    </profile>
+  </profiles>
+    <servers>
+    <server>
+        <id>github</id>
+        <username>YOUR_USERNAME</username> <!--  ############# CHANGE THIS!!!!! ############# -->
+        <password>YOUR_TOKEN</password> <!--  ############# CHANGE THIS!!!!! ############# -->
+    </server>
+    </servers>
+</settings>
+```
+
 
 ## Step 2
 
