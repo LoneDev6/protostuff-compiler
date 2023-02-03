@@ -49,7 +49,7 @@ syntax = "proto3";
 
 package example.simple;
 
-message Example {
+message MyClass {
   int32 id = 1;
   bool is_simple = 2;
   string name = 3;
@@ -57,10 +57,6 @@ message Example {
   map<string, int64> int64_attribute = 5;
   map<string, float> float_attribute = 6;
   optional AnotherClass another_class = 7;
-}
-
-message MyClass {
-  repeated Example example = 1;
 }
 
 message AnotherClass {
