@@ -1,41 +1,77 @@
 Protocol Buffers parser and code generator
 ------------------------------------------
 
-[![Build Status](https://travis-ci.org/protostuff/protostuff-compiler.svg?branch=master)](https://travis-ci.org/protostuff/protostuff-compiler)
+# How to use the Maven plugin
 
-Usage
------
+## Step 1
 
-* [maven plugin](https://github.com/protostuff/protostuff-compiler/wiki/Maven-Plugin)
-* [command-line interface](https://github.com/protostuff/protostuff-compiler/wiki/Command-line-interface)
+Add this to your maven plugins of your project.
 
-Java Source Code Generator
---------------------------
-
-Current status: development in progress.
-
-Generated code API: [draft](http://www.protostuff.io/documentation/compiler/java/generated-code).
-
-Documentation Generator
------------------------
-
-`protostuff-compiler` can generate html from proto files.
-
-Sample output: http://www.protostuff.io/samples/protostuff-compiler/html/#com.example.Address
-
-This generator is an alternative to https://github.com/estan/protoc-gen-doc
-
-Requirements
-------------
-
-| Component                                 | Version   |
-|-------------------------------------------|-----------|
-| JDK                                       | 1.8.0_45+ |  
-| [Apache Maven](https://maven.apache.org/) | 3.0.5+    |
-
-Build
------
-
+```xml
+<plugin>
+    <groupId>io.protostuff</groupId>
+    <artifactId>protostuff-maven-plugin</artifactId>
+    <version>2.0.0-alpha4-mutable-1.0.1</version>
+    <executions>
+        <execution>
+            <id>generate-sources</id>
+            <phase>generate-sources</phase>
+            <goals>
+                <goal>java</goal>
+            </goals>
+        </execution>
+    </executions>
+</plugin>
 ```
-mvn clean install
+
+Add these dependencies to your project
+
+```xml
+<dependency>
+    <groupId>io.protostuff</groupId>
+    <artifactId>protostuff-core</artifactId>
+    <version>1.8.0</version>
+</dependency>
+<dependency>
+    <groupId>io.protostuff</groupId>
+    <artifactId>protostuff-runtime</artifactId>
+    <version>1.7.4</version>
+</dependency>
 ```
+
+## Step 2
+
+Create your `.proto` files inside `src/proto/` folder in your project.
+
+Example:
+```proto
+syntax = "proto3";
+
+package example.simple;
+
+message Example {
+  int32 id = 1;
+  bool is_simple = 2;
+  string name = 3;
+  map<string, string> string_attribute = 4;
+  map<string, int64> int64_attribute = 5;
+  map<string, float> float_attribute = 6;
+  optional AnotherClass another_class = 7;
+}
+
+message MyClass {
+  repeated Example example = 1;
+}
+
+message AnotherClass {
+  repeated string name = 1;
+}
+```
+
+## Step 3
+
+Run `package` or `clean package` command.
+
+## Step 4
+
+If Intellij IDEA doesn't autocomple the new generated classes you have to right click on `target/generated-sources/proto` and mark the directory as `Generated Sources Root`
