@@ -152,7 +152,7 @@ public class MessageTest {
         assertFalse(testOneof.hasFooInt());
         assertFalse(testOneof.hasFooString());
         assertEquals(0, testOneof.getFooInt());
-        assertEquals("", testOneof.getFooString());
+        assertEquals(null, testOneof.getFooString());
     }
 
     @Test
@@ -164,7 +164,7 @@ public class MessageTest {
         assertTrue(testOneof.hasFooInt());
         assertFalse(testOneof.hasFooString());
         assertEquals(42, testOneof.getFooInt());
-        assertEquals("", testOneof.getFooString());
+        assertEquals(null, testOneof.getFooString());
     }
 
     @Test

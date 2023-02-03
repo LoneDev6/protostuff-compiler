@@ -37,7 +37,7 @@ public class ScalarTest {
         assertEquals(0, (int) msg.getSignedFixed32());
         assertEquals(0L, (long) msg.getSignedFixed64());
         assertEquals(false, msg.getBool());
-        assertEquals("", msg.getString());
+        assertEquals(null, msg.getString());
         assertEquals(0, msg.getBytes().size());
     }
 
