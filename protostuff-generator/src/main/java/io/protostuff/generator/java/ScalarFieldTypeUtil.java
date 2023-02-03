@@ -104,7 +104,7 @@ public class ScalarFieldTypeUtil {
             case BOOL:
                 return "false";
             case STRING:
-                return "\"\"";
+                return "null";
             case BYTES:
                 return "io.protostuff.ByteString.EMPTY";
             default:

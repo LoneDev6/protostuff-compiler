@@ -53,6 +53,7 @@ public class JavaGenerator implements ProtoCompiler {
                         .property("javaName", MessageFieldUtil::getFieldName)
                         .property("javaGetterName", MessageFieldUtil::getFieldGetterName)
                         .property("javaSetterName", MessageFieldUtil::getFieldSetterName)
+                        .property("javaRemoverName", MessageFieldUtil::getFieldRemoverName)
                         .property("javaRepeatedGetterName", MessageFieldUtil::getRepeatedFieldGetterName)
                         .property("javaRepeatedAdderName", MessageFieldUtil::getRepeatedFieldAdderName)
                         .property("javaMapAdderName", MessageFieldUtil::getMapFieldAdderName)

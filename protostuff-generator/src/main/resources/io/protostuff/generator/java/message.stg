@@ -275,6 +275,12 @@ public <field.parent.javaName> <field.javaSetterName>(<field.javaType> value) {
     return this;
 }
 
+public <field.parent.javaName> <field.javaRemoverName>() {
+    this.<field.javaName> = <field.javaDefaultValue>;
+    <field.javaBitFieldName> &= ~<field.javaBitFieldMask>;
+    return this;
+}
+
 public boolean <field.javaHasMethodName>() {
     return (<field.javaBitFieldName> & <field.javaBitFieldMask>) == <field.javaBitFieldMask>;
 }

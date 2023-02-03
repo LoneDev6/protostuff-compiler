@@ -18,6 +18,7 @@ public class MessageFieldUtil {
     public static final String HAS_PREFIX = "has";
     public static final String GETTER_PREFIX = "get";
     public static final String SETTER_PREFIX = "set";
+    public static final String REMOVER_PREFIX = "remove";
     public static final String LIST = "java.util.List";
     public static final String NULL = "null";
     public static final String PUT_PREFIX = "put";
@@ -56,6 +57,10 @@ public class MessageFieldUtil {
 
     public static String getFieldSetterName(Field field) {
         return SETTER_PREFIX + Formatter.toPascalCase(field.getName());
+    }
+
+    public static String getFieldRemoverName(Field field) {
+        return REMOVER_PREFIX + Formatter.toPascalCase(field.getName());
     }
 
     public static boolean isMessage(Field field) {
