@@ -54,7 +54,8 @@ Add these dependencies to your project
 </dependency>
 ```
 
-Open your `.m2/settings.xml` file (or create it) and add this (took from the [Github official tutorial](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-apache-maven-registry#authenticating-with-a-personal-access-token))
+Open your `.m2/settings.xml` file (or create it) and add this (took from the [Github official tutorial](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-apache-maven-registry#authenticating-with-a-personal-access-token)).
+Remember to create the token with the `read:packages`.
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
