@@ -20,7 +20,7 @@ Add this to your maven plugins of your project.
     <build>
         <plugins>
             <plugin>
-                <groupId>io.protostuff</groupId>
+                <groupId>dev.lone.protostuff</groupId>
                 <artifactId>protostuff-maven-plugin</artifactId>
                 <version>2.0.0-alpha4-mutable-1.0.1</version>
                 <executions>
