@@ -3,10 +3,7 @@ package io.protostuff.compiler.model;
 import com.google.common.base.MoreObjects;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Kostiantyn Shchepanovskyi
@@ -18,6 +15,7 @@ public class ModuleConfiguration {
     private final List<String> protoFiles;
     private final String template;
     private final String output;
+    private final List<String> threadSafe;
     private final Map<String, String> options;
 
     private ModuleConfiguration(Builder builder) {
@@ -26,6 +24,7 @@ public class ModuleConfiguration {
         protoFiles = builder.protoFiles;
         template = builder.template;
         output = builder.output;
+        threadSafe = builder.threadSafe;
         options = builder.options;
     }
 
@@ -40,6 +39,7 @@ public class ModuleConfiguration {
         builder.protoFiles = copy.protoFiles;
         builder.template = copy.template;
         builder.output = copy.output;
+        builder.threadSafe = copy.threadSafe;
         builder.options = copy.options;
         return builder;
     }
@@ -62,6 +62,10 @@ public class ModuleConfiguration {
 
     public List<Path> getIncludePaths() {
         return includePaths;
+    }
+
+    public List<String> getThreadSafe() {
+        return threadSafe;
     }
 
     public Map<String, String> getOptions() {
@@ -90,6 +94,7 @@ public class ModuleConfiguration {
         private String template;
         private String output;
         private Map<String, String> options;
+        private List<String> threadSafe;
 
         private Builder() {
         }
@@ -121,6 +126,11 @@ public class ModuleConfiguration {
 
         public Builder options(Map<String, String> val) {
             options = val;
+            return this;
+        }
+
+        public Builder threadSafe(String[] threadSafe) {
+            this.threadSafe = Arrays.asList(threadSafe);
             return this;
         }
 

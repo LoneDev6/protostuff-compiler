@@ -42,6 +42,7 @@ public class JavaGenerator implements ProtoCompiler {
                 .put(Message.class, SimpleObjectExtender.<Message>newBuilder()
                         .property("javaName", UserTypeUtil::getClassName)
                         .property("hasFields", MessageUtil::hasFields)
+                        .property("isThreadSafe", MessageUtil::isThreadSafe)
                         .property("javaBitFieldNames", MessageUtil::bitFieldNames)
                         .build())
                 .put(Field.class, SimpleObjectExtender.<Field>newBuilder()

@@ -1,7 +1,9 @@
 package io.protostuff.generator.java;
 
 import io.protostuff.compiler.model.Message;
+import io.protostuff.compiler.model.Module;
 import io.protostuff.compiler.model.Oneof;
+import io.protostuff.compiler.model.Proto;
 import io.protostuff.generator.Formatter;
 
 import java.util.ArrayList;
@@ -15,6 +17,29 @@ public class MessageUtil {
 
     public static boolean hasFields(Message message) {
         return !message.getFields().isEmpty();
+    }
+    public static boolean isThreadSafe(Message message) {
+        Proto proto = message.getProto();
+        Module module = proto.getModule();
+        List<String> threadSafe = module.getThreadSafe();
+        String identifier;
+        if(proto.getOptions().containsKey("java_package")) {
+            identifier = proto.getOptions().get("java_package").getString();
+        } else {
+            identifier = proto.getPackage().getValue();
+        }
+        identifier = identifier + ".";
+        if(threadSafe.contains(identifier + message.getName()))
+            return true;
+
+        for (String s : threadSafe) {
+            if(s.endsWith("*")) {
+                if(s.substring(0, s.length() - 1).equals(identifier))
+                    return true;
+            }
+        }
+
+        return false;
     }
 
     public static List<String> bitFieldNames(Message message) {

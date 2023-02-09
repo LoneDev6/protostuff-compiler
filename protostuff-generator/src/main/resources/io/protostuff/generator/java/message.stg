@@ -30,7 +30,11 @@ public <if(message.nested)>static <endif>final class <message.javaName>
     public static final io.protostuff.Schema\<<message.javaName>\> SCHEMA = Schema.INSTANCE;
 
     private <message.javaName> initialize() {
+        <if(message.isThreadSafe)>
+        <message.fields:field_initializer_threadsafe(); separator="\n">
+        <else>
         <message.fields:field_initializer(); separator="\n">
+        <endif>
         return this;
     }
 
@@ -147,15 +151,23 @@ private int <name>;
 field_initializer(field) ::= <<
 <if(field.map)>
 if (<field.javaName> == null) {
-    <field.javaName> = java.util.Collections.synchronizedMap(new java.util.HashMap\<>());
-} else {
-    <field.javaName> = java.util.Collections.synchronizedMap(<field.javaName>);
+    <field.javaName> = new java.util.HashMap\<>();
+}
+<elseif(field.repeated)>
+if (<field.javaName> == null) {
+    <field.javaName> = new java.util.ArrayList\<>();
+}
+<endif>
+>>
+
+field_initializer_threadsafe(field) ::= <<
+<if(field.map)>
+if (<field.javaName> == null) {
+    <field.javaName> = new java.util.concurrent.ConcurrentHashMap\<>();
 }
 <elseif(field.repeated)>
 if (<field.javaName> == null) {
     <field.javaName> = java.util.Collections.synchronizedList(new java.util.ArrayList\<>());
-} else {
-    <field.javaName> = java.util.Collections.synchronizedList(<field.javaName>);
 }
 <endif>
 >>
@@ -199,9 +211,6 @@ public <field.parent.javaName> <field.javaMapSetterName>(<field.javaMapType> <fi
 }
 
 public <field.parent.javaName> <field.javaMapAdderName>(<field.javaMapKeyType> key, <field.javaMapValueType> value) {
-    if (this.<field.javaName> == null) {
-        this.<field.javaName> = new java.util.HashMap\<>();
-    }
     this.<field.javaName>.put(key, value);
     return this;
 }
@@ -239,17 +248,11 @@ public <field.parent.javaName> <field.javaRepeatedSetterName>(<field.javaRepeate
 }
 
 public <field.parent.javaName> <field.javaRepeatedAdderName>(<field.javaType> <field.javaName>) {
-    if (this.<field.javaName> == null) {
-        this.<field.javaName> = new java.util.ArrayList\<>();
-    }
     this.<field.javaName>.add(<field.javaName>);
     return this;
 }
 
 public <field.parent.javaName> <field.javaRepeatedAdderName>(<field.javaRepeatedType> <field.javaName>) {
-    if (this.<field.javaName> == null) {
-        this.<field.javaName> = new java.util.ArrayList\<>();
-    }
     this.<field.javaName>.addAll(<field.javaName>);
     return this;
 }

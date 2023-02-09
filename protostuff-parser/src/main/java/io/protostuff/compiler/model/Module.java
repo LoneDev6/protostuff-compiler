@@ -10,6 +10,7 @@ public class Module {
     private String name;
     private List<Proto> protos;
     private String output;
+    private List<String> threadSafe;
     private Map<String, String> options;
 
     public Module() {
@@ -27,6 +28,16 @@ public class Module {
         this.output = output;
     }
 
+    public List<String> getThreadSafe() {
+        if (threadSafe == null) {
+            return Collections.emptyList();
+        }
+        return threadSafe;
+    }
+
+    public void setThreadSafe(List<String> threadSafe) {
+        this.threadSafe = threadSafe;
+    }
 
     public Map<String, String> getOptions() {
         return options;

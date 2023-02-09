@@ -13,7 +13,7 @@ public static final class Schema implements io.protostuff.Schema\<<message.javaN
 
     @Override
     public <message.javaName> newMessage() {
-        return new <message.javaName>();
+        return <message.javaName>.create();
     }
 
     @Override
@@ -193,15 +193,27 @@ if(instance.<field.oneof.javaCaseFieldName> == <field.oneof.javaName>.<field.jav
 >>
 
 map_field_write_switch(field) ::= <<
+<if(message.isThreadSafe)>
+synchronized(instance.<field.javaName>) {
+<endif>
+
 for(java.util.Map.Entry\<<field.javaMapKeyType>, <field.javaMapValueType>\> entry : instance.<field.javaName>.entrySet()) {
     <field.javaType> value = <field.javaType>.create()
         .setKey(entry.getKey())
         .setValue(entry.getValue());
     output.writeObject(<field.tag>, value, <field.javaType>.SCHEMA, true);
 }
+
+<if(message.isThreadSafe)>
+}
+<endif>
 >>
 
 repeated_field_write_switch(field) ::= <<
+<if(message.isThreadSafe)>
+synchronized(instance.<field.javaName>) {
+<endif>
+
 <if(field.type.message)>
 for(<field.javaType> <field.javaName> : instance.<field.javaName>) {
     output.writeObject(<field.tag>, <field.javaName>, <field.javaType>.SCHEMA, true);
@@ -213,6 +225,10 @@ for(<field.javaType> <field.javaName> : instance.<field.javaName>) {
 <else>
 for(<field.javaType> <field.javaName> : instance.<field.javaName>) {
     output.<field.protostuffWriteMethod>(<field.tag>, <field.javaName>, true);
+}
+<endif>
+
+<if(message.isThreadSafe)>
 }
 <endif>
 >>

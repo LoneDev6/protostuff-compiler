@@ -53,6 +53,7 @@ public class ProtostuffCompiler {
         module.setOptions(configuration.getOptions());
         module.setName(configuration.getName());
         module.setOutput(configuration.getOutput());
+        module.setThreadSafe(configuration.getThreadSafe());
         for (Map.Entry<String, Proto> entry : importedFiles.entrySet()) {
             Proto proto = entry.getValue();
             module.addProto(proto);

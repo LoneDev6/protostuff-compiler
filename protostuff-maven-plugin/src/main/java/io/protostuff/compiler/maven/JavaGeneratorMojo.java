@@ -35,6 +35,9 @@ public class JavaGeneratorMojo extends AbstractGeneratorMojo {
     @Parameter(defaultValue = "java.util.concurrent.CompletableFuture")
     private String rpcReturnType;
 
+    @Parameter(property = "threadSafe")
+    private String[] threadSafe;
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         super.execute();
@@ -46,6 +49,7 @@ public class JavaGeneratorMojo extends AbstractGeneratorMojo {
                 .name("java")
                 .includePaths(singletonList(sourcePath))
                 .template(JavaGenerator.GENERATOR_NAME)
+                .threadSafe(threadSafe)
                 .options(ImmutableMap.<String, String>builder()
                         .put(JavaGenerator.SERVICE_RETURN_TYPE_OPTION, rpcReturnType)
                         .build())
