@@ -22,7 +22,7 @@ Add this to your maven plugins of your project.
             <plugin>
                 <groupId>dev.lone.protostuff</groupId>
                 <artifactId>protostuff-maven-plugin</artifactId>
-                <version>2.0.0-alpha4-mutable-1.0.1</version>
+                <version>2.0.0-alpha4-mutable-1.0.2</version>
                 <executions>
                     <execution>
                         <id>generate-sources</id>
@@ -128,3 +128,36 @@ Run `package` or `clean package` command.
 ## Step 4
 
 If Intellij IDEA doesn't autocomple the new generated classes you have to right click on `target/generated-sources/proto` and mark the directory as `Generated Sources Root`
+
+
+# Advanced
+
+## Thread safe classes
+
+You can generate classes with thread safe maps and lists.
+
+Example:
+```xml
+<plugin>
+    <groupId>dev.lone.protostuff</groupId>
+    <artifactId>protostuff-maven-plugin</artifactId>
+    <version>2.0.0-alpha4-mutable-1.0.2</version>
+    <configuration>
+        <threadSafe>
+            <entry>com.mypackage.mysubpackage.*</entry> <!-- Supports wildcard to add all classes in a package-->
+            <entry>com.mypackage.another.SpecificClass</entry>
+            <entry>com.mypackage.another.SpecificClass2</entry>
+        </threadSafe>
+    </configuration>
+    <executions>
+        <execution>
+            <id>generate-sources</id>
+            <phase>generate-sources</phase>
+            <goals>
+                <goal>java</goal>
+            </goals>
+        </execution>
+    </executions>
+</plugin>
+```
+
